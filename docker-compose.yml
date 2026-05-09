@@ -6,14 +6,26 @@ services:
     restart: unless-stopped
     environment:
       - SIGNALING_PORT=7766
-    # 不暴露端口到宿主机，仅 nginx 通过内部网络访问
 
   client:
     build:
       context: .
       dockerfile: client/Dockerfile
     restart: unless-stopped
-    ports:
-      - "${APP_PORT:-7755}:7755"
     depends_on:
       - signaling
+
+  caddy:
+    image: caddy:alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+    depends_on:
+      - client
+
+volumes:
+  caddy_data:

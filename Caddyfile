@@ -1,0 +1,5 @@
+yourdomain.com, www.example.com {
+    handle /p2p* {
+        reverse_proxy client:7755
+    }
+}

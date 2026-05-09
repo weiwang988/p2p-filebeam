@@ -16,9 +16,10 @@ function getSignalingUrl(): string {
     return import.meta.env.VITE_SIGNALING_URL
   }
   const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
-  // Production (built with vite build): nginx proxies /ws to signaling server
+  // Production (built with vite build): signaling proxied at /ws under the same base path
   if (import.meta.env.PROD) {
-    return `${protocol}//${window.location.host}/ws`
+    const base = import.meta.env.BASE_URL
+    return `${protocol}//${window.location.host}${base}ws`
   }
   // Development: signaling server runs on same hostname, port 7766
   return `${protocol}//${window.location.hostname}:7766`
