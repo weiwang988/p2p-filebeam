@@ -1,5 +1,14 @@
 yourdomain.com, www.example.com {
-    handle /p2p* {
-        reverse_proxy client:7755
+    # 所有重定向由 Caddy 处理，避免 nginx 暴露内部端口
+    # redir / /p2p/ 301
+    redir /p2p /p2p/ 301
+
+    handle /p2p/* {
+        reverse_proxy client:7755 {
+            header_up Host {host}
+            header_up X-Real-IP {remote}
+            header_up X-Forwarded-For {remote}
+            header_up X-Forwarded-Proto {scheme}
+        }
     }
 }
