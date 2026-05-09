@@ -28,6 +28,20 @@
       </div>
       <h1 class="title">FileBeam</h1>
       <p class="subtitle">P2P 文件共享 — 快速 · 直连 · 安全</p>
+
+      <button
+        class="crypto-badge"
+        :class="{
+          'crypto-on': app.encryptionEnabled.value,
+          'crypto-off': !app.encryptionEnabled.value && app.cryptoAvailable,
+          'crypto-na': !app.cryptoAvailable,
+        }"
+        :disabled="!app.cryptoAvailable"
+        :title="cryptoLabel"
+        @click="app.toggleEncryption()"
+      >
+        {{ cryptoLabel }}
+      </button>
     </header>
 
     <div class="cards">
@@ -90,7 +104,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { NButton, NInput, NForm, NFormItem, NAlert, NTag } from 'naive-ui'
 import { injectApp } from '@/composables/injectApp'
 import { useUserProfile } from '@/composables/useUserProfile'
@@ -98,6 +112,10 @@ import { validateRoomCode } from '@/utils/validation'
 
 const app = injectApp()
 const roomCode = ref('')
+const cryptoLabel = computed(() => {
+  if (!app.cryptoAvailable) return '加密不可用'
+  return app.encryptionEnabled.value ? '已加密' : '明文'
+})
 const joinError = ref<string>()
 
 const { userName, avatarColor, avatarChar, updateName } = useUserProfile()
@@ -199,6 +217,44 @@ function handleJoin() {
   font-size: 1rem;
   color: #8b949e;
   margin: 0;
+}
+
+.crypto-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 12px;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border: 1px solid;
+  cursor: pointer;
+  transition: all 0.15s;
+  background: transparent;
+}
+
+.crypto-badge:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.crypto-on {
+  color: #3fb950;
+  border-color: rgba(63, 185, 80, 0.3);
+  background: rgba(63, 185, 80, 0.1);
+}
+
+.crypto-off {
+  color: #d29922;
+  border-color: rgba(210, 153, 34, 0.3);
+  background: rgba(210, 153, 34, 0.1);
+}
+
+.crypto-na {
+  color: #f85149;
+  border-color: rgba(248, 81, 73, 0.3);
+  background: rgba(248, 81, 73, 0.1);
 }
 
 .cards {
