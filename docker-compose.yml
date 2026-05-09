@@ -1,0 +1,19 @@
+services:
+  signaling:
+    build:
+      context: .
+      dockerfile: server/Dockerfile
+    restart: unless-stopped
+    environment:
+      - SIGNALING_PORT=7766
+    # 不暴露端口到宿主机，仅 nginx 通过内部网络访问
+
+  client:
+    build:
+      context: .
+      dockerfile: client/Dockerfile
+    restart: unless-stopped
+    ports:
+      - "${APP_PORT:-7755}:7755"
+    depends_on:
+      - signaling
